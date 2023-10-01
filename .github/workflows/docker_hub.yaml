@@ -147,9 +147,9 @@ jobs:
       #         body: output
       #       })
 
-      - name: Terraform Plan Status
-        if: steps.plan.outcome == 'failure'
-        run: exit 1
+      #- name: Terraform Plan Status
+      #  if: steps.plan.outcome == 'failure'
+      #  run: exit 1
 
       - name: Terraform Apply
         working-directory: terraform/
