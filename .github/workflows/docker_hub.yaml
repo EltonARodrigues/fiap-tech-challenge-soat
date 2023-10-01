@@ -98,12 +98,12 @@ jobs:
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
       
       - name: Terraform Init
-        uses: hashicorp/terraform-github-actions/init@v0.4.0
         id: init
+        working-directory: terraform/
         env:
-          TF_ACTION_WORKING_DIR: 'terraform'
           AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: terraform init
       # - name: Terraform Format
       #   id: fmt # TODO
       #   working-directory: terraform/
@@ -113,16 +113,19 @@ jobs:
 
       
       - name: Terraform Validate
-        uses: hashicorp/terraform-github-actions/validate@v0.3.7
+        id: validate
+        working-directory: terraform/
+        run: terraform validate -no-color
 
       - name: Terraform Plan
-        uses: hashicorp/terraform-github-actions/plan@v0.4.0
+        id: plan
+        working-directory: terraform/
         env:
-          TF_ACTION_WORKING_DIR: 'terraform'
           AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         # if: github.event_name == 'pull_request'
-
+        run: terraform plan -var-file=terraform.tfvars -out=tfplan -input=false
+        continue-on-error: true
 
       # - name: Update Pull Request
       #   uses: actions/github-script@v6
@@ -159,12 +162,12 @@ jobs:
       #  run: exit 1
 
       - name: Terraform Apply
-        uses: hashicorp/terraform-github-actions/apply@v0.4.0
+        working-directory: terraform/
         env:
-          TF_ACTION_WORKING_DIR: 'terraform'
           AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         # if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -input=false tfplan
   deploy-eks:
     needs: [terraform]
     runs-on: ubuntu-latest
