@@ -10,8 +10,8 @@
 name: Publish Docker image
 
 on:
-  release:
-    types: [published]
+  push:
+    branches: [ "feature/fiap-53-criar-repositorio-para-infra-eks-com-terraform" ] # TODO - modificar para main
 
 jobs:
   push_to_registry:
