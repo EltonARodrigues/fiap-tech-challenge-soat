@@ -125,7 +125,7 @@ jobs:
           AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         # if: github.event_name == 'pull_request'
-        run: terraform plan -var-file=terraform.tfvars --input=false --auto-approve
+        run: terraform plan -var-file=terraform.tfvars -auto-approve -input=false
         continue-on-error: true
 
       - name: Terraform Apply
