@@ -179,7 +179,7 @@ jobs:
       run: |
         aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws eks --region <SUA_REGIAO> update-kubeconfig --name ${{ AWS_CLUSTER_NAME }}
+        aws eks --region <SUA_REGIAO> update-kubeconfig --name ${{ secrets.AWS_CLUSTER_NAME }}
 
     - name: Deploy no Kubernetes
       run: |
