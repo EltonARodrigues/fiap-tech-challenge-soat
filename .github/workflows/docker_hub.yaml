@@ -79,13 +79,17 @@ jobs:
 #         terraform plan -destroy
 # #        terraform destroy -auto-approve
 #       working-directory: ${{ github.event.inputs.tfpath }}
+  
 
   terraform:
+
     name: "Terraform"
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
     steps:
+      - name: Configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v2
       - name: Checkout
         uses: actions/checkout@v3
 
