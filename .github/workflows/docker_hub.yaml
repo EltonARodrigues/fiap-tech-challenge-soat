@@ -88,6 +88,9 @@ jobs:
     permissions:
       pull-requests: write
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: GET AWS Plan
         id: copyfrom
         run: |
@@ -99,9 +102,6 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.REGION }}
         continue-on-error: true # incase infra does not exist
-
-      # - name: Checkout
-      #   uses: actions/checkout@v3
 
       # - name: Setup Terraform
       #   uses: hashicorp/setup-terraform@v2
