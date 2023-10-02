@@ -104,11 +104,8 @@ jobs:
         run: |
           echo `pwd`
           echo `ls`
+          echo `~/.aws/credentials`
           aws s3 cp s3://test-terraform-fiap-tech/tech-tfplan terraform/tech-tfplan
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.REGION }}
         continue-on-error: true # incase infra does not exist
 
       # - name: Setup Terraform
