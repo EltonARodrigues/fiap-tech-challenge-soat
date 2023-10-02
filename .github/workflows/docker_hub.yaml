@@ -159,7 +159,7 @@ jobs:
         aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.AWS_CLUSTER_NAME }}
 
     - name: Deploy Secrets
-      run: echo ${{ secrets.K8S_SECRETS }} > k8s/secrets.yaml
+      run: echo `${{ secrets.K8S_SECRETS }}` > k8s/secrets.yaml
     - name: Deploy no Kubernetes
       run: |
         kubectl apply -f k8s/secrets.yaml
