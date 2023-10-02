@@ -91,8 +91,8 @@ jobs:
       - name: GET AWS Plan
         id: copyfrom
         run: |
-          echo pwd
-          echo ls
+          echo `pwd`
+          echo `ls`
           aws s3 cp s3://test-terraform-fiap-tech/tech-tfplan tech-tfplan
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
