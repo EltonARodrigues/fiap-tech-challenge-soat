@@ -90,7 +90,7 @@ jobs:
     steps:
       - name: GET AWS Plan
         id: copyfrom
-        run: aws s3 cp s3://test-terraform-fiap-tech/terraform.tfstate terraform.tfstate
+        run: aws s3 cp s3://test-terraform-fiap-tech/tech-tfplan tech-tfplan
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -125,7 +125,7 @@ jobs:
           AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         # if: github.event_name == 'pull_request'
-        run: terraform plan -var-file=terraform.tfvars -auto-approve -input=false
+        run: terraform plan -var-file=terraform.tfvars -input=false -out tech-tfplan
         continue-on-error: true
 
       - name: Terraform Apply
@@ -134,10 +134,10 @@ jobs:
           AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         # if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -input=false
+        run: terraform apply -input=false -auto-approve tech-tfplan
 
       - name: AWS Save Plan Copy
-        run: aws s3 cp terraform.tfstate s3://test-terraform-fiap-tech/terraform.tfstate
+        run: aws s3 cp tech-tfplan s3://test-terraform-fiap-tech/tech-tfplan
         id: copy
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
