@@ -145,14 +145,10 @@ jobs:
       #   run: terraform apply -input=false -auto-approve tech-tfplan
 
       - name: AWS Save Plan Copy
+        id: copy
         run: |
           echo `ls terraform/`
           aws s3 cp terraform/tech-tfplan s3://test-terraform-fiap-tech/tech-tfplan
-        id: copy
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.REGION }}
 
   # deploy-eks:
   #   needs: [terraform]
