@@ -90,90 +90,93 @@ jobs:
     steps:
       - name: GET AWS Plan
         id: copyfrom
-        run: aws s3 cp s3://test-terraform-fiap-tech/tech-tfplan tech-tfplan
+        run: |
+          echo pwd
+          echo ls
+          aws s3 cp s3://test-terraform-fiap-tech/tech-tfplan tech-tfplan
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.REGION }}
         continue-on-error: true # incase infra does not exist
 
-      - name: Checkout
-        uses: actions/checkout@v3
+      # - name: Checkout
+      #   uses: actions/checkout@v3
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      # - name: Setup Terraform
+      #   uses: hashicorp/setup-terraform@v2
+      #   with:
+      #     cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
       
-      - name: Terraform Init
-        id: init
-        working-directory: terraform/
-        env:
-          AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: terraform init
+      # - name: Terraform Init
+      #   id: init
+      #   working-directory: terraform/
+      #   env:
+      #     AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #   run: terraform init
       
-      - name: Terraform Validate
-        id: validate
-        working-directory: terraform/
-        run: terraform validate -no-color
+      # - name: Terraform Validate
+      #   id: validate
+      #   working-directory: terraform/
+      #   run: terraform validate -no-color
 
-      - name: Terraform Plan
-        id: plan
-        working-directory: terraform/
-        env:
-          AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        # if: github.event_name == 'pull_request'
-        run: terraform plan -input=false -out tech-tfplan
-        continue-on-error: true
+      # - name: Terraform Plan
+      #   id: plan
+      #   working-directory: terraform/
+      #   env:
+      #     AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #   # if: github.event_name == 'pull_request'
+      #   run: terraform plan -input=false -out tech-tfplan
+      #   continue-on-error: true
 
-      - name: Terraform Apply
-        working-directory: terraform/
-        env:
-          AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        # if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -input=false -auto-approve tech-tfplan
+      # - name: Terraform Apply
+      #   working-directory: terraform/
+      #   env:
+      #     AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #   # if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      #   run: terraform apply -input=false -auto-approve tech-tfplan
 
-      - name: AWS Save Plan Copy
-        run: aws s3 cp tech-tfplan s3://test-terraform-fiap-tech/tech-tfplan
-        id: copy
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.REGION }}
+      # - name: AWS Save Plan Copy
+      #   run: aws s3 cp tech-tfplan s3://test-terraform-fiap-tech/tech-tfplan
+      #   id: copy
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     AWS_DEFAULT_REGION: ${{ secrets.REGION }}
 
-  deploy-eks:
-    needs: [terraform]
-    runs-on: ubuntu-latest
+  # deploy-eks:
+  #   needs: [terraform]
+  #   runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
+  #   steps:
+  #   - name: Checkout Repository
+  #     uses: actions/checkout@v2
 
-    - name: Configure AWS CLI
-      run: |
-        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws eks --region <SUA_REGIAO> update-kubeconfig --name ${{ secrets.AWS_CLUSTER_NAME }}
+  #   - name: Configure AWS CLI
+  #     run: |
+  #       aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #       aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #       aws eks --region <SUA_REGIAO> update-kubeconfig --name ${{ secrets.AWS_CLUSTER_NAME }}
 
-    - name: Deploy no Kubernetes
-      run: |
-        kubectl apply -f k8s/db/db.svc.yaml
-        kubectl apply -f k8s/db/db.pv.yaml
-        kubectl apply -f k8s/db/db.pvc.yaml
-        kubectl apply -f k8s/db/db.deployment.yaml
-        kubectl apply -f k8s/api/api.deployment.yaml
-        kubectl apply -f k8s/api/api.svc.yaml
+  #   - name: Deploy no Kubernetes
+  #     run: |
+  #       kubectl apply -f k8s/db/db.svc.yaml
+  #       kubectl apply -f k8s/db/db.pv.yaml
+  #       kubectl apply -f k8s/db/db.pvc.yaml
+  #       kubectl apply -f k8s/db/db.deployment.yaml
+  #       kubectl apply -f k8s/api/api.deployment.yaml
+  #       kubectl apply -f k8s/api/api.svc.yaml
 
-    # - name: Atualizar Serviço
-    #   run: |
-    #     kubectl rollout restart deployment/<NOME_DO_DEPLOYMENT>
+  #   # - name: Atualizar Serviço
+  #   #   run: |
+  #   #     kubectl rollout restart deployment/<NOME_DO_DEPLOYMENT>
 
-    - name: Verificar Status do Deploy
-      run: |
-        kubectl get pods
+  #   - name: Verificar Status do Deploy
+  #     run: |
+  #       kubectl get pods
 
-    - name: Limpar Configurações
-      run: aws configure unset aws_access_key_id aws_secret_access_key
+  #   - name: Limpar Configurações
+  #     run: aws configure unset aws_access_key_id aws_secret_access_key
