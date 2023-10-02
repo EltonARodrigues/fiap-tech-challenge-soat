@@ -39,7 +39,7 @@ jobs:
           push: true
           tags: |
             echo ${GITHUB_SHA::7}
-            ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:${ GITHUB_SHA::7 }
+            ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:${{ steps.meta.outputs.tags }}
             ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:latest
           labels: ${{ steps.meta.outputs.labels }}
 
