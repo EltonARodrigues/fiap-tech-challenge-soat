@@ -12,74 +12,35 @@ on:
 jobs:
 
   # build:
-  #   push_to_registry:
-  #   name: Push Docker image to Docker Hub
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Check out the repo
-  #       uses: actions/checkout@v4
+  push_to_registry:
+    name: Push Docker image to Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
       
-  #     - name: Log in to Docker Hub
-  #       uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
-  #       with:
-  #         username: ${{ secrets.DOCKER_USERNAME }}
-  #         password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
       
-  #     - name: Extract metadata (tags, labels) for Docker
-  #       id: meta
-  #       uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-  #       with:
-  #         images: eltonarodrigues/test-fiap-ci
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: eltonarodrigues/test-fiap-ci
       
-  #     - name: Build and push Docker image
-  #       uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
-  #       with:
-  #         context: .
-  #         file: ./Dockerfile
-  #         push: true
-  #         tags: ${{ steps.meta.outputs.tags }}
-  #         labels: ${{ steps.meta.outputs.labels }}
-
-#   tf_code_check:
-#     name: Terraform Validation and Build
-#     runs-on: ubuntu-latest
-
-#     #if:  ${{ inputs.tfpath }} 
-#     steps:
-#     - uses: actions/checkout@v2.5.0
-
-#     - name: Configure AWS Credentials Action For GitHub Actions
-#       uses: aws-actions/configure-aws-credentials@v1
-#       with:
-#         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-#         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#         aws-region: ${{ secrets.AWS_REGION }}
-#     - name: Setup Terraform CLI
-#       uses: hashicorp/setup-terraform@v2.0.2
-
-#     - name: Terraform init, plan and apply
-#       run: |
-#         echo `pwd`
-#         echo "tfpath ${{ github.event.inputs.tfpath }}"
-#         echo "** Running Terraform Init**"
-#         terraform init
-
-#         echo "** Running Terraform Validate**"
-#         terraform validate
-
-#         echo "** Running Terraform Plan**"
-#         terraform plan
-
-# #        echo "** Running Terraform Apply**"
-# #        terraform apply -auto-approve
-#       working-directory: ${{ github.event.inputs.tfpath }}
-#     - name: Terraform Destroy
-#       run: |
-#         echo "** Running Terraform Destroy**"
-#         terraform plan -destroy
-# #        terraform destroy -auto-approve
-#       working-directory: ${{ github.event.inputs.tfpath }}
-  
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:git rev-parse --short HEAD)
+            ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:latest
+          labels: ${{ steps.meta.outputs.labels }}
 
   # terraform:
 
@@ -104,79 +65,72 @@ jobs:
   #       run: aws s3 cp s3://test-terraform-fiap-tech/tech-tfplan terraform/tech-tfplan
   #       continue-on-error: true # incase infra does not exist
 
-      # - name: Setup Terraform
-      #   uses: hashicorp/setup-terraform@v2
-      #   with:
-      #     cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+  #     - name: Setup Terraform
+  #       uses: hashicorp/setup-terraform@v2
+  #       with:
+  #         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
       
-      # - name: Terraform Init
-      #   id: init
-      #   working-directory: terraform/
-      #   env:
-      #     AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #   run: terraform init
+  #     - name: Terraform Init
+  #       id: init
+  #       working-directory: terraform/
+  #       env:
+  #         AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #       run: terraform init
       
-      # - name: Terraform Validate
-      #   id: validate
-      #   working-directory: terraform/
-      #   run: terraform validate -no-color
+  #     - name: Terraform Validate
+  #       id: validate
+  #       working-directory: terraform/
+  #       run: terraform validate -no-color
 
-      # - name: Terraform Plan
-      #   id: plan
-      #   working-directory: terraform/
-      #   env:
-      #     AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #   # if: github.event_name == 'pull_request'
-      #   run: terraform plan -input=false -out tech-tfplan
-      #   continue-on-error: true
+  #     - name: Terraform Plan
+  #       id: plan
+  #       working-directory: terraform/
+  #       env:
+  #         AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #       # if: github.event_name == 'pull_request'
+  #       run: terraform plan -input=false -out tech-tfplan
+  #       continue-on-error: true
 
-      # - name: Terraform Apply
-      #   working-directory: terraform/
-      #   env:
-      #     AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #   # if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      #   run: terraform apply -input=false -auto-approve tech-tfplan
+  #     - name: Terraform Apply
+  #       working-directory: terraform/
+  #       env:
+  #         AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #       # if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+  #       run: terraform apply -input=false -auto-approve tech-tfplan
 
-      # - name: AWS Save Plan Copy
-      #   id: copy
-      #   run: aws s3 cp terraform/tech-tfplan s3://test-terraform-fiap-tech/tech-tfplan
+  #     - name: AWS Save Plan Copy
+  #       id: copy
+  #       run: aws s3 cp terraform/tech-tfplan s3://test-terraform-fiap-tech/tech-tfplan
 
-  deploy-eks:
-    # # needs: [terraform]
-    runs-on: ubuntu-latest
+  # deploy-eks:
+  #   needs: [ terraform ]
+  #   runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
+  #   steps:
+  #   - name: Checkout Repository
+  #     uses: actions/checkout@v2
 
-    - name: Configure AWS CLI
-      run: |
-        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.AWS_CLUSTER_NAME }}
+  #   - name: Configure AWS CLI
+  #     run: |
+  #       aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #       aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #       aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.AWS_CLUSTER_NAME }}
 
-    - name: Deploy Secrets
-      run: echo `${{ secrets.K8S_SECRETS }}` > k8s/secrets.yaml
-    - name: Deploy no Kubernetes
-      run: |
-        kubectl apply -f k8s/secrets.yaml
-        kubectl apply -f k8s/db/db.svc.yaml
-        kubectl apply -f k8s/db/db.pv.yaml
-        kubectl apply -f k8s/db/db.pvc.yaml
-        kubectl apply -f k8s/db/db.deployment.yaml
-        kubectl apply -f k8s/api/api.deployment.yaml
-        kubectl apply -f k8s/api/api.svc.yaml
+  #   - name: Deploy Secrets
+  #     run: echo "${{ secrets.K8S_SECRETS }}" > k8s/secrets.yaml
+  #   - name: Deploy no Kubernetes
+  #     run: |
+  #       kubectl apply -f k8s/secrets.yaml
+  #       kubectl apply -f k8s/db/db.svc.yaml
+  #       kubectl apply -f k8s/db/db.pv.yaml
+  #       kubectl apply -f k8s/db/db.pvc.yaml
+  #       kubectl apply -f k8s/db/db.deployment.yaml
+  #       kubectl apply -f k8s/api/api.deployment.yaml
+  #       kubectl apply -f k8s/api/api.svc.yaml
 
-    # - name: Atualizar Serviço
-    #   run: |
-    #     kubectl rollout restart deployment/<NOME_DO_DEPLOYMENT>
-
-    - name: Verificar Status do Deploy
-      run: |
-        kubectl get pods
-
-    - name: Limpar Configurações
-      run: aws configure unset aws_access_key_id aws_secret_access_key
+  #   - name: Verificar Status do Deploy
+  #     run: |
+  #       kubectl get pods
