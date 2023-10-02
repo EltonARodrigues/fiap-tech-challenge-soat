@@ -97,7 +97,7 @@ jobs:
   #       with:
   #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
   #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY  }}
-  #         aws-region: us-east-1
+  #         aws-region: ${{ secrets.AWS_REGION }}
 
   #     - name: GET AWS Plan
   #       id: copyfrom
@@ -156,7 +156,7 @@ jobs:
       run: |
         aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws eks --region <SUA_REGIAO> update-kubeconfig --name ${{ secrets.AWS_CLUSTER_NAME }}
+        aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.AWS_CLUSTER_NAME }}
 
     - name: Deploy no Kubernetes
       run: |
