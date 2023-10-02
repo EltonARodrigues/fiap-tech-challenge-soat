@@ -160,7 +160,7 @@ jobs:
 
     - name: Deploy Secrets
       run: |
-        echo ${{ K8S_SECRETS }} > secrets.yaml
+        echo ${{ secrets.K8S_SECRETS }} > secrets.yaml
         cat secrets.yaml
     # - name: Deploy no Kubernetes
     #   run: |
