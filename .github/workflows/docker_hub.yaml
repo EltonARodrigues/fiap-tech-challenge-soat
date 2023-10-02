@@ -149,35 +149,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # - name: Checkout Repository
-    #   uses: actions/checkout@v2
+    - name: Checkout Repository
+      uses: actions/checkout@v2
 
-    # - name: Configure AWS CLI
-    #   run: |
-    #     aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-    #     aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    #     aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.AWS_CLUSTER_NAME }}
+    - name: Configure AWS CLI
+      run: |
+        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.AWS_CLUSTER_NAME }}
 
     - name: Deploy Secrets
       run: |
-        echo ${{ secrets.K8S_SECRETS }} > secrets.yaml
-        cat secrets.yaml
-    # - name: Deploy no Kubernetes
+        echo ${{ secrets.K8S_SECRETS }} > k8s/secrets.yaml
+    - name: Deploy no Kubernetes
+      run: |
+        kubectl apply -f k8s/secrets.yaml
+        kubectl apply -f k8s/db/db.svc.yaml
+        kubectl apply -f k8s/db/db.pv.yaml
+        kubectl apply -f k8s/db/db.pvc.yaml
+        kubectl apply -f k8s/db/db.deployment.yaml
+        kubectl apply -f k8s/api/api.deployment.yaml
+        kubectl apply -f k8s/api/api.svc.yaml
+
+    # - name: Atualizar Serviço
     #   run: |
-    #     kubectl apply -f k8s/db/db.svc.yaml
-    #     kubectl apply -f k8s/db/db.pv.yaml
-    #     kubectl apply -f k8s/db/db.pvc.yaml
-    #     kubectl apply -f k8s/db/db.deployment.yaml
-    #     kubectl apply -f k8s/api/api.deployment.yaml
-    #     kubectl apply -f k8s/api/api.svc.yaml
+    #     kubectl rollout restart deployment/<NOME_DO_DEPLOYMENT>
 
-    # # - name: Atualizar Serviço
-    # #   run: |
-    # #     kubectl rollout restart deployment/<NOME_DO_DEPLOYMENT>
+    - name: Verificar Status do Deploy
+      run: |
+        kubectl get pods
 
-    # - name: Verificar Status do Deploy
-    #   run: |
-    #     kubectl get pods
-
-    # - name: Limpar Configurações
-    #   run: aws configure unset aws_access_key_id aws_secret_access_key
+    - name: Limpar Configurações
+      run: aws configure unset aws_access_key_id aws_secret_access_key
